@@ -46,5 +46,10 @@ public class CamaraScript : MonoBehaviour {
         ResizeSpriteToScreen(BaggrundFar);
         ResizeSpriteToScreen(BaggrundClose);
         followPlayer();
+
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 }

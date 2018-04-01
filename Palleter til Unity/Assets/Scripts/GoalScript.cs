@@ -5,7 +5,7 @@ using System.Collections;
 
 public class GoalScript : MonoBehaviour {
 
-    public Sprite usedCheckpoint;
+    public Sprite victoryFlag;
     AudioSource au;
     float f;
     float waitForSound;
@@ -20,6 +20,7 @@ public class GoalScript : MonoBehaviour {
     {
         if (coll.gameObject.tag == "Player")
         {
+            gameObject.GetComponent<SpriteRenderer>().sprite = victoryFlag;
             if(!au.isPlaying)
             {
                 au.Play(0);
