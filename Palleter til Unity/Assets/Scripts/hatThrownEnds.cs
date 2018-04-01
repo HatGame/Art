@@ -33,7 +33,6 @@ public class hatThrownEnds : MonoBehaviour {
             collision = other.gameObject;
             hasCollidedWithOther = true;
             gameObject.GetComponentInParent<HatThrown_script>().hasCollidedWithObject = true;
-            Debug.Log("DenErGodFin");
         }
         else if (other.tag != "Checkpoint")
         {

@@ -29,8 +29,6 @@ public class MANDFRED_script : MonoBehaviour {
     public float jumpBuffer;
 
     public Animator animator;
-
-    public AudioClip walkingSound;
     public AudioClip deathSound;
 
     GameObject[] jumpRayOrigins;
@@ -44,6 +42,7 @@ public class MANDFRED_script : MonoBehaviour {
 
     public GameObject hatJustThrown;
     public bool disableControls;
+    public bool isJumping;
 
 
     void checkForColisions()
@@ -156,6 +155,7 @@ public class MANDFRED_script : MonoBehaviour {
                 {
                     isTouchingGround = false;
                     animator.SetTrigger("Jump");
+                    isJumping = true;
                     rbody.position = rbody.position - new Vector2(0, -distToGround -0.1f);
                     rbody.velocity = new Vector2(rbody.velocity.x, 0);
                     rbody.AddForce(new Vector2(0, 100 * jumpPower));
@@ -180,26 +180,16 @@ public class MANDFRED_script : MonoBehaviour {
 
 
             //animator/sound
-            if (Input.GetKey("w") || Input.GetKey(KeyCode.Space))
+            if (isJumping)
             {
                 animator.SetBool("isWalking", false);
             }
             else if (Input.GetKey("a") || Input.GetKey("d"))
             {
                 animator.SetBool("isWalking", true);
-                if (animator.GetBool("isOnGround") && !au.isPlaying)
-                {
-                    au.volume = 0.15f;
-                    au.clip = walkingSound;
-                    au.Play(0);
-                }
             }
             else
             {
-                if (au.clip == walkingSound)
-                {
-                    au.Stop();
-                }
                 animator.SetBool("isWalking", false);
             }
         }
@@ -225,7 +215,7 @@ public class MANDFRED_script : MonoBehaviour {
             hatOnhead.SetActive(false);
         }
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && hatOnhead.activeInHierarchy)
+        if (Input.GetKey(KeyCode.Mouse0) && hatOnhead.activeInHierarchy)
         {
             hatOnhead.SetActive(false);
             hatIsOnHead = false;

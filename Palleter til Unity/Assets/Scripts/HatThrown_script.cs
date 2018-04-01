@@ -128,7 +128,7 @@ public class HatThrown_script : MonoBehaviour {
         
         if (sideCollider.GetComponent<hatThrownEnds>().hasCollidedWithPlayer || endCollider.GetComponent<hatThrownEnds>().hasCollidedWithPlayer)
         {
-            if(safeTime + timeCreated <= Time.time)
+            if(onTheWayBack)
             {
                 if (!sideCollider.GetComponent<hatThrownEnds>().hasCollidedWithOther)
                 {
