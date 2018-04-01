@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4866132969500092}
   - component: {fileID: 61579230141338832}
   - component: {fileID: 114530348364255796}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: collisionDetectorSides
   m_TagString: sideCollider
   m_Icon: {fileID: 0}
@@ -39,7 +39,7 @@ GameObject:
   - component: {fileID: 61408317328383358}
   - component: {fileID: 114951467453774988}
   - component: {fileID: 61546493747722686}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: collisionDetectorEnds
   m_TagString: endCollider
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 50831428036794438}
   - component: {fileID: 114509018213879820}
   - component: {fileID: 82582862615784122}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: HatThrown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -293,10 +293,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   safeTime: 0
-  outSpeed: 30
+  outSpeed: 18
   backAccel: 0.6
-  knockbackPowerHorizontal: 1
-  knockbackPowerVertical: 100
+  knockbackPowerHorizontal: 0.68
+  knockbackPowerVertical: 68
   isStuck: 0
   onTheWayBack: 0
   speed: 0

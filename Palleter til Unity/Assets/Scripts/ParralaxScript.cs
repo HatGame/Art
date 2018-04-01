@@ -6,12 +6,13 @@ public class ParralaxScript : MonoBehaviour {
 
     public GameObject player;
     public float speed;
+    public float verticalMultiplier;
     public int layer;
 
     public void movePos()
     {
         Vector2 playerPos = player.GetComponent<Transform>().position;
-        gameObject.GetComponent<Transform>().localPosition = new Vector3(-playerPos.x * speed / 10, -playerPos.y * speed / 100, layer);
+        gameObject.GetComponent<Transform>().localPosition = new Vector3(-playerPos.x * speed / 10, -playerPos.y * speed / 10 * verticalMultiplier, layer);
     }
 
 

@@ -31,27 +31,25 @@ public class MANDFRED_script : MonoBehaviour {
     public Animator animator;
 
     public AudioClip walkingSound;
-    public AudioClip jumpingSound;
     public AudioClip deathSound;
 
     GameObject[] jumpRayOrigins;
     Rigidbody2D rbody;
     GameObject hatOnhead;
     AudioSource au;
+    Collider2D jumpCollider;
     
     Vector3 gpos;
     Vector2 mousePos;
 
-    // debug values
-    public bool debug1;
-    public bool debug2;
-    public float debug3;
-    public float debug4;
+    public GameObject hatJustThrown;
+    public bool disableControls;
 
 
     void checkForColisions()
     {
         // Vi ser på om mandfred står på jorden
+        
         foreach (GameObject origin in jumpRayOrigins)
         {
             RaycastHit2D downDist = Physics2D.Raycast(origin.transform.position, new Vector2(0, -1));
@@ -68,8 +66,8 @@ public class MANDFRED_script : MonoBehaviour {
                 animator.SetBool("isOnGround", false);
             }
         }
+        
     }
-
 
     public Vector2 GetMousePosition() //finder musens position, og giver den tilbage som en Vector2
     {
@@ -87,17 +85,42 @@ public class MANDFRED_script : MonoBehaviour {
 
     void Movement()
     {
-
-        // Horizontal bevægelse
-        // når man står på jorden
-        if (isTouchingGround)
+        if (!disableControls)
         {
-            if (Input.GetKey("a")) 
+            // Horizontal bevægelse
+            // når man står på jorden
+            if (isTouchingGround)
+            {
+                if (Input.GetKey("a"))
+                {
+                    if (hastighed >= -Speed)
+                    {
+                        hastighed = Mathf.MoveTowards(hastighed, -Speed, movementAcceleration);
+                    }
+                }
+                else if (Input.GetKey("d"))
+                {
+                    if (hastighed <= Speed)
+                    {
+                        hastighed = Mathf.MoveTowards(hastighed, Speed, movementAcceleration);
+                    }
+                }
+                else //hvis hværken a eller d trykkes, stopper man helt.
+                {
+                    hastighed = Mathf.MoveTowards(hastighed, 0, groundDeAcceleration);
+                }
+            }
+            // når man DI'er i luften
+            else if (Input.GetKey("a"))
             {
                 if (hastighed >= -Speed)
                 {
                     hastighed = Mathf.MoveTowards(hastighed, -Speed, movementAcceleration);
-                } 
+                }
+                else
+                {
+                    hastighed = Mathf.MoveTowards(hastighed, Speed, airResistanceDeAcceleration);
+                }
             }
             else if (Input.GetKey("d"))
             {
@@ -105,111 +128,80 @@ public class MANDFRED_script : MonoBehaviour {
                 {
                     hastighed = Mathf.MoveTowards(hastighed, Speed, movementAcceleration);
                 }
-            }
-            else //hvis hværken a eller d trykkes, stopper man helt.
-            {
-                hastighed = Mathf.MoveTowards(hastighed, 0, groundDeAcceleration);
-            }
-        }
-        // når man DI'er i luften
-        else if (Input.GetKey("a")) 
-        {
-            if (hastighed >= -Speed)
-            {
-                hastighed = Mathf.MoveTowards(hastighed, -Speed, movementAcceleration);
-            }
-            else
-            {
-                hastighed = Mathf.MoveTowards(hastighed, Speed, airResistanceDeAcceleration);
-            }
-        }
-        else if (Input.GetKey("d"))
-        {
-            if (hastighed <= Speed)
-            {
-                hastighed = Mathf.MoveTowards(hastighed, Speed, movementAcceleration);
-            }
-            else
-            {
-                hastighed = Mathf.MoveTowards(hastighed, Speed, airResistanceDeAcceleration);
-            }
-        }
-        else //hvis man ikke bevæger sig i luften, så beholder man den vertikale inerti. 
-        {
-            hastighed = Mathf.MoveTowards(hastighed, 0, airResistanceDeAcceleration);
-        }
-
-        rbody.velocity = new Vector2(hastighed, rbody.velocity.y);
-
-        if (hastighed < 0)// vender spilleren
-        {
-            transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-        }
-        else if (hastighed > 0)
-        {
-            transform.rotation = Quaternion.AngleAxis(0, Vector3.up);
-        }
-
-        // Hop
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown("w"))
-        {
-            if (isTouchingGround)
-            {
-                animator.SetTrigger("Jump");
-                rbody.position = rbody.position - new Vector2(0, -distToGround);
-                rbody.velocity = new Vector2(rbody.velocity.x, 0);
-                rbody.AddForce(new Vector2(0, 100 * jumpPower));
-            }
-        }
-        if (!isTouchingGround) // forøg/forminsk faldehastighed
-        {
-            if (Input.GetKey("s"))
-            {
-                rbody.AddForce(new Vector2(0, fallPower));
-            }
-            else if (Input.GetKey(KeyCode.Space) || Input.GetKey("w"))
-            {
-                if(rbody.velocity.y > 0)
+                else
                 {
-                    rbody.AddForce(new Vector2(0, floatPower));
+                    hastighed = Mathf.MoveTowards(hastighed, Speed, airResistanceDeAcceleration);
                 }
             }
-        }
+            else //hvis man ikke bevæger sig i luften, så beholder man den vertikale inerti. 
+            {
+                hastighed = Mathf.MoveTowards(hastighed, 0, airResistanceDeAcceleration);
+            }
+
+            rbody.velocity = new Vector2(hastighed, rbody.velocity.y);
+
+            if (hastighed < 0)// vender spilleren
+            {
+                transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+            }
+            else if (hastighed > 0)
+            {
+                transform.rotation = Quaternion.AngleAxis(0, Vector3.up);
+            }
+
+            // Hop
+            if (Input.GetKey(KeyCode.Space) || Input.GetKey("w"))
+            {
+                if (isTouchingGround)
+                {
+                    isTouchingGround = false;
+                    animator.SetTrigger("Jump");
+                    rbody.position = rbody.position - new Vector2(0, -distToGround -0.1f);
+                    rbody.velocity = new Vector2(rbody.velocity.x, 0);
+                    rbody.AddForce(new Vector2(0, 100 * jumpPower));
+                }
 
 
-        //animator/sound
-        if (Input.GetKeyDown("w") || Input.GetKeyDown(KeyCode.Space))
-        {
-            if (au.clip != deathSound)
-            {
-                au.volume = 1;
-                au.clip = jumpingSound;
-                au.Play(0);
             }
-            else if (!au.isPlaying)
+            if (!isTouchingGround) // forøg/forminsk faldehastighed
             {
-                au.volume = 1;
-                au.clip = jumpingSound;
-                au.Play(0);
+                if (Input.GetKey("s"))
+                {
+                    rbody.AddForce(new Vector2(0, fallPower));
+                }
+                else if (Input.GetKey(KeyCode.Space) || Input.GetKey("w"))
+                {
+                    if (rbody.velocity.y > 0)
+                    {
+                        rbody.AddForce(new Vector2(0, floatPower));
+                    }
+                }
             }
-        }
-        else if (Input.GetKey("a") || Input.GetKey("d"))
-        {
-            animator.SetBool("isWalking", true);
-            if (animator.GetBool("isOnGround") && !au.isPlaying)
+
+
+            //animator/sound
+            if (Input.GetKey("w") || Input.GetKey(KeyCode.Space))
             {
-                au.volume = 0.15f;
-                au.clip = walkingSound;
-                au.Play(0);
+                animator.SetBool("isWalking", false);
             }
-        }
-        else
-        {
-            if (au.clip == walkingSound)
+            else if (Input.GetKey("a") || Input.GetKey("d"))
             {
-                au.Stop();
+                animator.SetBool("isWalking", true);
+                if (animator.GetBool("isOnGround") && !au.isPlaying)
+                {
+                    au.volume = 0.15f;
+                    au.clip = walkingSound;
+                    au.Play(0);
+                }
             }
-            animator.SetBool("isWalking", false);
+            else
+            {
+                if (au.clip == walkingSound)
+                {
+                    au.Stop();
+                }
+                animator.SetBool("isWalking", false);
+            }
         }
     }
 
@@ -217,7 +209,7 @@ public class MANDFRED_script : MonoBehaviour {
     void throwHat()
     {
         gpos = gameObject.transform.position;
-        GameObject hatJustThrown = Instantiate(hatThrown, new Vector3(gpos.x, gpos.y, -9f), Quaternion.identity);
+        hatJustThrown = Instantiate(hatThrown, new Vector3(gpos.x, gpos.y, -9f), Quaternion.identity);
         hatJustThrown.GetComponent<HatThrown_script>().ThrowTowards(gpos, mousePos);
     }
 
@@ -239,6 +231,18 @@ public class MANDFRED_script : MonoBehaviour {
             hatIsOnHead = false;
             throwHat();
         }
+    }
+
+
+    public void respawn()
+    {
+        rbody.velocity = Vector3.zero;
+        hastighed = 0;
+        rbody.position = Spawnlocation;
+        Destroy(hatJustThrown);
+        hatIsOnHead = true;
+        au.volume = 1f;
+        disableControls = false;
     }
 
 
@@ -265,15 +269,25 @@ public class MANDFRED_script : MonoBehaviour {
         hatHandler();
     }
 
-    private void OnCollisionEnter2D(Collision2D coll)
+    private void OnTriggerEnter2D(Collider2D coll)
     {
+        
         if (coll.gameObject.tag == "deadly")
         {
-            rbody.velocity = Vector3.zero;
-            rbody.position = Spawnlocation;
-            au.volume = 1f;
+            disableControls = true;
+            respawn();
             au.clip = deathSound;
             au.Play(0);
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D coll)
+    {
+        
+        if (coll.gameObject.tag == "deadly")
+        {
+            disableControls = true;
+            respawn();
         }
     }
 }

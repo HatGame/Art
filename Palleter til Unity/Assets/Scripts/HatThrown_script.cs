@@ -170,6 +170,7 @@ public class HatThrown_script : MonoBehaviour {
         
         if (isStuck)
         {
+            gameObject.layer = 0;
             if(stuckTime + stuckDuration <= Time.time)
             {
                 mandfred.GetComponent<MANDFRED_script>().hatIsOnHead = true;
